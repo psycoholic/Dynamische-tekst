@@ -22,6 +22,7 @@ function dynamicTextArea( $atts ){
             echo "BaseName and url match";
             // Retrieve the content out of the directory
             $document = file_get_contents($file);
+            // file_put_contents($document, $file, FILE_APPEND);
         } else {
             echo "Basename and url dont match";
             $document = the_post();
