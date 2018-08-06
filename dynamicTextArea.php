@@ -1,13 +1,11 @@
 /***********************
  * Dynamic text area shortcode
- * Retrieves file with same slug as the url, gets the content
- * Shortcode Syntax = Revers to default text area[textload] Gets first of div class [textload type="textone"], textone,texttwo,textthree,textfour,textfive
+ * Retrieves file with same page slug as the url, gets the content from within a .docx file
+ * Shortcode Syntax = Default:[textload] || [textload type="textone"] || [textload type="texttwo"] || [textload type="textthree..."]
+ * Version 1.0
  */
 
- /*************************
-  * Docx to text conversion
-  */
-  //FUNCTION :: read a docx file and return the string
+// Convert .docx file's to text
 function readDocx($filePath) {
     // Create new ZIP archive
     $zip = new ZipArchive;
@@ -37,18 +35,17 @@ function readDocx($filePath) {
     // In case of failure return empty string
     return "";
 }
-
-//[textload type="textone"]
+// Retrieve text from .docx file from server
 function dynamicTextArea( $atts ){
-        // current directory
+        // Get current directory of the site on server
         $currentDirectory = getcwd();
         $currentPage = $_SERVER['REQUEST_URI'];
-         // File retrieve 
-        $file = $currentDirectory . '/wp-content/themes/bb-theme-child' . $currentPage . ".docx";
-        // Convert the document to text, and to html after that.
+         // File retrieve from directory with same name as the page slug.
+        $file = $currentDirectory . "/teksten" . $currentPage . ".docx";
+        // Convert the document to text, and to html after that. 
         $converted_document = readDocx($file);
         $html_document = html_entity_decode ($converted_document);
-         // Get filename out of the url
+         // Get filename of the file out of the directory
         $dirName = basename($file);
         // Build the url
         $url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
@@ -56,20 +53,18 @@ function dynamicTextArea( $atts ){
         $dirString = "/" . strval($dirName) . "/";
         // Replace the mime type for check against url
         $dirReplaced = str_replace('.docx', '', $dirString);
-        // Convert Docx to text   
             // Check the current url of the page against the filename
             if (preg_match($dirReplaced, $url)) {
-                // Retrieve the content out of the directory
-                // $document = file_get_contents($file);
+                // Retrieve the content and explode the array
                 $firstStep = explode('<div id="text1">', $html_document);
                 $secondStep = explode('</div>', $firstStep[1]);
 
             } else {
                 echo "Basename and url dont match". "<br>";
-                $document = the_post();
+                $secondStep = the_post();
             }
     
-        // Check for wich part of the text has to be retrieved.
+        // Check for shortcode attribute used, retrieve according text
         extract( shortcode_atts( array(
             'type' => 'myvalue'
 
@@ -110,8 +105,6 @@ function dynamicTextArea( $atts ){
                 $output = $secondStep[0];
                 break;
         }
-
         return $output;
-
 }
 add_shortcode( 'textload', 'dynamicTextArea' );
