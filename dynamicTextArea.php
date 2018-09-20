@@ -3,7 +3,7 @@
 Plugin Name:  Dynamic text area
 Plugin URI:   http://www.waydesign.nl/dynamictextarea
 Description:  Retrieves file with same page slug as the url, gets the content from within a .docx file. Added support for page name shortcode [pagename]
-Version:      0.9
+Version:      1.0
 Author:       http://www.waydesign.nl
 Author URI:   http://www.waydesign.nl
 License:      GPL2
@@ -247,17 +247,18 @@ class location_number
          *  Loop thrue each item and check if the page name matches
          *  if it matches get the second array item and return it to the shortcode
          *  In the case the array item doesnt have a number, it returns a fallback number.
-         */
+         */    
 
         if (!empty($loc_var)) {
             foreach ($csv as $item){
-                // $newitem = '/' . strval($item[0]) . '/';
                 $newitem = trim(strval($item[0]));
                 $newNumb = trim(strval($item[1]));
                     // replace clutter
                     $newNumb = preg_replace('/[;]/', '', $newNumb);
                     $newitem = preg_replace('/[,]/', '', $newitem);
-                    
+                    $newitem = strtolower($newitem);
+                    $loc_var = strtolower($loc_var);
+
                     if (strpos($newitem, $loc_var) !== FALSE && !empty($loc_var)) {
                         if ($newNumb && $newitem === $loc_var){
                             $tel_number = $newNumb;
